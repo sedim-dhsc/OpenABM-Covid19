@@ -49,7 +49,15 @@ PYTHON_SAFE_UPDATE_PARAMS = [
     "lockdown_on",
     "lockdown_elderly_on",
     "app_turned_on",
-    "app_users_fraction",
+    "app_users_fraction_0_9",
+    "app_users_fraction_10_19",
+    "app_users_fraction_20_29",
+    "app_users_fraction_30_39",
+    "app_users_fraction_40_49",
+    "app_users_fraction_50_59",
+    "app_users_fraction_60_69",
+    "app_users_fraction_70_79",
+    "app_users_fraction_80",
     "trace_on_symptoms",
     "trace_on_positive",
     "lockdown_house_interaction_multiplier",
@@ -829,7 +837,7 @@ class Model:
             res = covid19.set_app_users(self.c_model,users,n_users,False)
             if res == False :
                 raise ModelParameterException( "Failed to remove old app_users" )
-    
+
     def seed_infect_by_idx(self, ID, strain_idx = 0, strain = None, network_id = -1 ):
         
         n_total = self._params_obj.get_param("n_total")

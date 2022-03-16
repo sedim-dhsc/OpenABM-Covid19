@@ -602,10 +602,20 @@ int get_model_param_priority_test_contacts(model *model, int idx)
 }
 
 /*****************************************************************************************
-*  Name:		get_model_param_app_users_fraction
+*  Name:        get_model_param_app_users_fraction
 *  Description: Gets the value of double parameter
 ******************************************************************************************/
-double get_model_param_app_users_fraction(model *model)
+double get_model_param_app_users_fraction(model *model, int idx)
+{
+    if (idx >= N_AGE_GROUPS) return -1;
+    return model->params->app_users_fraction[idx];
+}
+
+/*****************************************************************************************
+*  Name:		get_model_param_app_users_fraction
+*  Description: Gets the total app users fraction as average weighted by population
+******************************************************************************************/
+double get_total_app_users_fraction(model *model)
 {
     int age;
 	double t_pop, frac;
@@ -1044,19 +1054,17 @@ int set_model_param_priority_test_contacts( model *model, int value, int idx )
 	model->params->priority_test_contacts[idx] = value;
 	return TRUE;
 }
+
 /*****************************************************************************************
-*  Name:		set_model_param_app_users_fraction
+*  Name:        set_model_param_app_users_fraction
 *  Description: Sets the value of parameter
 ******************************************************************************************/
-int set_model_param_app_users_fraction( model *model, double value )
+int set_model_param_app_users_fraction( model *model, double value, int idx)
 {
-    if( value > 1 || value < 0 )
-    	return FALSE;
+    if (idx >= N_AGE_GROUPS) return FALSE;
+    if( value > 1 || value < 0 ) return FALSE;
 
-    int age;
-    for( age = 0; age < N_AGE_GROUPS; age++ )
-        model->params->app_users_fraction[ age ] = value;
-
+    model->params->app_users_fraction[ idx ] = value;
     set_up_app_users( model );
     return TRUE;
 }

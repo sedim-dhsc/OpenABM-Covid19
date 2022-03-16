@@ -133,8 +133,7 @@ class TestClass(object):
                     app_turn_on_time = 1,
                     quarantine_household_on_symptoms = 1,
                     quarantine_compliance_traced_symptoms = 1.0,
-                ),
-                app_users_fraction = 0.85
+                )
             ) 
         ],
         "test_lockdown_transmission_rates": [ 
@@ -1231,7 +1230,16 @@ class TestClass(object):
                 )
             )
         ],
-                                       
+        "test_set_app_users_fraction" : [
+            dict(
+                test_params = dict( 
+                    n_total = 2e4, 
+                    n_seed_infection = 2000,
+                    end_time = 8,
+                    app_turned_on = 1
+                )
+            )
+        ],
     }
 
     """
@@ -1530,7 +1538,7 @@ class TestClass(object):
                                     err_msg = "lockdown not changing random transmission as expected" )
       
 
-    def test_trace_on_symptoms(self, test_params, app_users_fraction ):
+    def test_trace_on_symptoms(self, test_params):
         """
         Tests that people who are traced on symptoms are
         real contacts
@@ -3321,4 +3329,24 @@ class TestClass(object):
              
         np.testing.assert_equal( len( df_comp ), 27, err_msg = "incorrect number of types of interactions")
         np.testing.assert_array_less( df_comp[ "diff"], df_comp[ "tol"], err_msg = "number of interactions not reverted back to original")
-                  
+
+    def test_set_app_users_fraction(self, test_params):  
+        
+        """
+        Check that the app users fraction can be updated during model run
+        """ 
+         
+        params = utils.get_params_swig()
+        for param, value in test_params.items():
+            params.set_param( param, value )
+        model  = utils.get_model_swig( params )
+        model.run( n_steps = 1, verbose = False )
+
+        app_params = [ "app_users_fraction_0_9", "app_users_fraction_10_19",  "app_users_fraction_20_29",
+            "app_users_fraction_30_39",  "app_users_fraction_40_49", "app_users_fraction_50_59",
+            "app_users_fraction_60_69",  "app_users_fraction_70_79", "app_users_fraction_80" ]
+        for i, param in enumerate(app_params):
+            expected_value = i / 100.0
+            model.update_running_params( param, expected_value )
+            actual_value = model.get_param( param )
+        np.testing.assert_equal(actual_value, expected_value, err_msg = f"value of {param} is invalid")
